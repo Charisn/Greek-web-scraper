@@ -1,0 +1,13 @@
+README.md
+setup.py
+greek_scraper/__init__.py
+greek_scraper/cli.py
+greek_scraper/gpu_processor.py
+greek_scraper/middlewares.py
+greek_scraper/pipelines.py
+greek_scraper/spider.py
+greek_scraper.egg-info/PKG-INFO
+greek_scraper.egg-info/SOURCES.txt
+greek_scraper.egg-info/dependency_links.txt
+greek_scraper.egg-info/requires.txt
+greek_scraper.egg-info/top_level.txt
