@@ -36,7 +36,7 @@ class ScraperSpider(scrapy.Spider): # Renamed class to ScraperSpider
         'RANDOMIZE_DOWNLOAD_DELAY': True,
         'RETRY_ENABLED': True,
         'RETRY_TIMES': 3,
-        'LOG_LEVEL': 'INFO',
+        'LOG_LEVEL': 'ERROR',
         'COOKIES_ENABLED': False,
         'REDIRECT_MAX_TIMES': 2,
         'AJAXCRAWL_ENABLED': False,
@@ -114,11 +114,7 @@ class ScraperSpider(scrapy.Spider): # Renamed class to ScraperSpider
 
         # --- Extract Cleaned Text ---
         try:
-            # Option 1: Use trafilatura for robust text extraction.
             extracted_text = extract(html_content) or ""
-            # Option 2: Alternatively, use BeautifulSoup to grab text from <p> tags:
-            # soup = BeautifulSoup(html_content, 'lxml')
-            # extracted_text = ' '.join(p.get_text(strip=True) for p in soup.find_all('p'))
             normalized_text = unicodedata.normalize('NFKC', extracted_text).strip()
             item['text'] = normalized_text
         except Exception as e:

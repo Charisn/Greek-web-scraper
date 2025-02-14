@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="greek_scraper",
-    version="0.1.3",  # Start with a version number
+    version="0.4",  # Start with a version number
     author="Charis Nikolaidis", # Replace with your name - IMPORTANT
     author_email="ncharis97@gmail.com", # Replace with your email - IMPORTANT
     description="Ultra-fast and efficient web scraper with GPU utilization for text cleaning and JSON output. Supports generic and language-specific scraping.",

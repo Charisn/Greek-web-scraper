@@ -1,6 +1,7 @@
 # Greek Web Scraper
 
 ![Greek Scraper](https://img.shields.io/badge/Scrapy-Greek%20Scraper-brightgreen)
+[![v0.4](https://img.shields.io/pypi/v/greek_scraper.svg)](https://pypi.org/project/greek_scraper/)
 
 A high-performance web scraper built on Scrapy and optimized for Greek-language content extraction. This tool leverages GPU acceleration (via CuPy) for text processing and features robust retry mechanisms to ensure reliable scraping across multiple domains.
 

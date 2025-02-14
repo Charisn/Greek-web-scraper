@@ -2,3 +2,6 @@ __pycache__/
 *.pyc 
 scrapy_job/ 
 venv/ 
+*.egg-info/
+build/
+dist/
