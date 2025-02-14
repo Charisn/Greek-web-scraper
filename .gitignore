@@ -3,5 +3,6 @@ __pycache__/
 scrapy_job/ 
 venv/ 
 *.egg-info/
+greek_scraper.egg-info/
 build/
 dist/
