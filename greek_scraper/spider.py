@@ -18,6 +18,7 @@ from tldextract import extract as tld_extract
 from bs4 import BeautifulSoup  # For alternative text extraction (if needed)
 from twisted.internet.error import DNSLookupError
 from twisted.internet.threads import deferToThread
+from scrapy.dupefilters import RFPDupeFilter
 
 from greek_scraper.gpu_processor import GPUTextProcessor # Import GPU Processor - ensure correct relative import
 
@@ -87,52 +88,40 @@ class ScraperSpider(scrapy.Spider): # Renamed class to ScraperSpider
 
     def parse(self, response):
         current_domain = urlparse(response.url).netloc
-        print(f"[ScraperSpider] Processing URL: {response.url} (Domain: {current_domain})")
-        item = {
-            'url': response.url,
-            'text': '',
-            'links': []
-        }
+        item = {'url': response.url, 'text': '', 'links': []}
 
+        # --- Check Content Type ---
         try:
             content_type = response.headers.get('Content-Type', b'').decode('utf-8', errors='ignore').lower()
-            is_text = any(x in content_type for x in ['text/html', 'text/plain', 'application/xml', 'application/xhtml+xml'])
-            if not is_text:
-                return item
-            html_content = response.text
-        except Exception as e:
-            print(f"[ScraperSpider] Error processing content from {response.url}: {e}")
+            if not any(x in content_type for x in ['text/html', 'text/plain', 'application/xml', 'application/xhtml+xml']):
+                return  # Skip non-text responses
+        except Exception:
             return
 
         # --- Extract Cleaned Text ---
         try:
-            extracted_text = extract(html_content) or ""
-            normalized_text = unicodedata.normalize('NFKC', extracted_text).strip()
-            item['text'] = normalized_text
-        except Exception as e:
-            print(f"[ScraperSpider] Error extracting text from {response.url}: {e}")
+            extracted_text = extract(response.text) or ""
+            item['text'] = unicodedata.normalize('NFKC', extracted_text).strip()
+        except Exception:
             item['text'] = ""
 
         # --- Extract and Process Links ---
         try:
             links = response.css('a::attr(href)').getall()
-        except Exception as e:
-            print(f"[ScraperSpider] Error extracting links from {response.url}: {e}")
+        except Exception:
             links = []
+
         for link in links:
             try:
                 full_url = response.urljoin(link)
                 parsed = urlparse(full_url)
-                if parsed.scheme in ['http', 'https']:
-                    # Follow links only within the same domain as the seed.
-                    if parsed.netloc == current_domain and full_url not in self.processed_urls:
-                        self.processed_urls.add(full_url)
-                        item['links'].append(full_url)
-                        yield scrapy.Request(full_url, callback=self.parse, errback=self.handle_error, dont_filter=True)
-            except Exception as e:
-                print(f"[ScraperSpider] Error processing link {link} on {response.url}: {e}")
+                if parsed.scheme in ['http', 'https'] and parsed.netloc == current_domain:
+                    yield scrapy.Request(full_url, callback=self.parse, errback=self.handle_error)
+                    item['links'].append(full_url)
+            except Exception:
                 continue
 
+        print(f"✅ Domain successfully crawled: {current_domain}")
         yield item
 
     def _normalize_url(self, domain):
@@ -142,7 +131,6 @@ class ScraperSpider(scrapy.Spider): # Renamed class to ScraperSpider
 
     def handle_error(self, failure):
         request = failure.request
-        print(f"[ScraperSpider] Request failed: {request.url} - {failure.value}")
         # You could add more sophisticated error handling and retries here.
 
     def _is_target_domain(self, domain):
@@ -189,17 +177,15 @@ class ScraperSpider(scrapy.Spider): # Renamed class to ScraperSpider
         If yes and we are below our concurrent domain limit, schedule a new one and
         prevent the spider from closing.
         """
-        if self.pending_domains:
-            # If active domains (based on discovered_domains) is less than our limit, add one.
-            if len(self.active_domains) < self.concurrent_domain_limit:
-                domain = self.pending_domains.pop(0).strip()
-                if domain:
-                    url = self._normalize_url(domain)
-                    netloc = urlparse(url).netloc
-                    if netloc not in self.discovered_domains and len(self.discovered_domains) < self.max_domains:
-                        self.discovered_domains.add(netloc)
-                        self.active_domains.add(netloc)
-                        req = scrapy.Request(url, callback=self.parse, errback=self.handle_error, dont_filter=True)
-                        self.crawler.engine.crawl(req, self)
-                        raise DontCloseSpider("Scheduling new seed domain")
+        if self.pending_domains and len(self.active_domains) < self.concurrent_domain_limit:
+            domain = self.pending_domains.pop(0).strip()
+            if domain:
+                url = self._normalize_url(domain)
+                netloc = urlparse(url).netloc
+                if netloc not in self.discovered_domains and len(self.discovered_domains) < self.max_domains:
+                    self.discovered_domains.add(netloc)
+                    self.active_domains.add(netloc)
+                    req = scrapy.Request(url, callback=self.parse, errback=self.handle_error)
+                    self.crawler.engine.crawl(req, self)
+                    raise DontCloseSpider("Scheduling new seed domain")
         # If no pending seed domain, let the spider close normally.

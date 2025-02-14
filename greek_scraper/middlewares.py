@@ -15,10 +15,8 @@ class RobustEncodingMiddleware:
                 except UnicodeDecodeError:
                     try:
                         detected = chardet.detect(response.body)['encoding'] or 'utf-8'
-                        print(f"[RobustEncodingMiddleware] Detected encoding {detected} on {response.url}")
                         decoded = response.body.decode(detected, errors='replace')
                     except Exception as e:
-                        print(f"[RobustEncodingMiddleware] Critical decoding failure on {response.url}: {e}")
                         return response.replace(body=b'', encoding='utf-8')
                 return response.replace(body=decoded.encode('utf-8'), encoding='utf-8')
         return response
@@ -26,11 +24,9 @@ class RobustEncodingMiddleware:
 class CustomRetryMiddleware:
     def process_spider_exception(self, response, exception, spider):
         req = response.request
-        print(f"[CustomRetryMiddleware] Exception on {req.url}: {exception}")
 
         if isinstance(exception, DNSLookupError):
             domain = urlparse(req.url).netloc
-            print(f"[CustomRetryMiddleware] DNSLookupError encountered for domain: {domain}. Will not retry for this domain in this run.")
             spider.blocked_domains.add(domain)  # Add domain to blocked list
             return  # Do not retry DNS errors, move on to the next request
 

@@ -5,13 +5,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="greek_scraper",
-    version="0.4",  # Start with a version number
-    author="Charis Nikolaidis", # Replace with your name - IMPORTANT
-    author_email="ncharis97@gmail.com", # Replace with your email - IMPORTANT
+    version="0.9.4",
+    author="Charis Nikolaidis",
+    author_email="ncharis97@gmail.com",
     description="Ultra-fast and efficient web scraper with GPU utilization for text cleaning and JSON output. Supports generic and language-specific scraping.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Charisn/Greek-web-scraper", # Replace with your project repo URL (e.g., GitHub) - IMPORTANT
+    url="https://github.com/Charisn/Greek-web-scraper",
 
     project_urls={
         "Bug Tracker": "https://github.com/Charisn/Greek-web-scraper/issues",
@@ -22,7 +22,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "scrapy",
-        "cupy-cuda12x", # Or appropriate cupy version for your CUDA setup - important for Windows
+        "cupy-cuda12x",
         "trafilatura",
         "tldextract",
         "beautifulsoup4",
@@ -56,9 +56,9 @@ setup(
         "automat",
         "constantly",
         "six",
-        "babel", # Keeping just in case for date stuff, can be removed if proven unnecessary
-        "pytz",  # Keeping as babel and dateparser might need it
-        "python-dateutil", # Keeping as babel and dateparser *might* need it
+        "babel",
+        "pytz",
+        "python-dateutil",
     ],
     extras_require={
         "dev": [
@@ -69,11 +69,10 @@ setup(
         ],
     },
 
-    # Keywords to improve searchability on PyPI
     keywords="web scraping gpu scraper text-cleaning json scraping",
-    python_requires='>=3.10', # Or your minimum Python version
+    python_requires='>=3.10',
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
         "Topic :: Software Development :: Libraries :: Python Modules",

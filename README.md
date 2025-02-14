@@ -59,6 +59,11 @@ pip install -r requirements.txt
 pip install cupy-cuda12x  # Adjust version to match your CUDA toolkit
 ```
 
+#### ! CUDA CUDA Toolkit 12.1 Is Required
+```bash
+https://developer.nvidia.com/cuda-12-1-0-download-archive
+```
+
 ## 🕵️ Usage
 
 ### Command-Line Interface

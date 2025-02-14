@@ -17,24 +17,29 @@ greek_filter_kernel = cp.ElementwiseKernel(
 
 class GPUTextProcessor:
     def __init__(self):
-        self.stream = cp.cuda.Stream()
+        self.stream = cp.cuda.Stream()  # Use CUDA stream for async execution
 
     def process_batch(self, texts):
         try:
-            with self.stream:
-                code_points = [np.array([ord(c) for c in t], dtype=np.uint32) for t in texts]
-                lengths = [len(arr) for arr in code_points]
-                max_len = max(lengths) if lengths else 0
+            code_points = [np.array([ord(c) for c in t], dtype=np.uint32) for t in texts]
+            lengths = [len(arr) for arr in code_points]
+            max_len = max(lengths) if lengths else 0
+
+            if max_len == 0:
+                return texts  # Avoid processing empty inputs
+
+            with self.stream:  # Asynchronous execution
                 gpu_buffer = cp.zeros((len(texts), max_len), dtype=cp.uint32)
                 for i, arr in enumerate(code_points):
                     gpu_buffer[i, :len(arr)] = cp.asarray(arr)
+
                 mask = greek_filter_kernel(gpu_buffer)
-                cleaned_texts = []
-                for i in range(len(texts)):
-                    filtered = gpu_buffer[i][mask[i, :len(code_points[i])]].get()
-                    cleaned = ''.join([chr(c) for c in filtered if c != 0])
-                    cleaned_texts.append(cleaned)
-            return cleaned_texts # Explicit return
+                cleaned_texts = [
+                    ''.join(chr(c) for c in gpu_buffer[i][mask[i, :len(code_points[i])]].get() if c != 0)
+                    for i in range(len(texts))
+                ]
+
+            cp.cuda.Device(0).synchronize()  # Ensure GPU execution completes before returning
+            return cleaned_texts
         except Exception as e:
-            print(f"[GPUTextProcessor] ERROR during batch processing: {e}")
-            return None # Explicitly return None in case of error
+            return texts  # Fallback to original input if GPU fails
