@@ -1,4 +1,4 @@
-# web-scaper/middlewares.py
+# greek_scraper/middlewares.py
 import chardet
 from urllib.parse import urlparse
 from scrapy.exceptions import IgnoreRequest

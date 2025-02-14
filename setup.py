@@ -4,15 +4,15 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="Greek_website_scraper",
+    name="Greek_scraper",
     version="0.1.0",  # Start with a version number
     author="Charis Nikolaidis", # Replace with your name - IMPORTANT
     author_email="ncharis97@gmail.com", # Replace with your email - IMPORTANT
     description="Ultra-fast and efficient web scraper with GPU text cleaning and JSON output. Supports generic and language-specific scraping.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="[Your Package Repository URL]", # Replace with your project repo URL (e.g., GitHub) - IMPORTANT
-    packages=find_packages(where='greek_scraper'), # Tells setuptools to find packages in 'greek_scraper' dir
+    url="https://github.com/Charisn/Web-scraper", # Replace with your project repo URL (e.g., GitHub) - IMPORTANT
+    packages=find_packages(),  # Auto-detects packages correctly
     package_dir={'': 'greek_scraper'}, # Tells setuptools package directories are under 'greek_scraper'
     install_requires=[
         "scrapy",
@@ -54,7 +54,7 @@ setup(
         "pytz",  # Keeping as babel and dateparser might need it
         "python-dateutil", # Keeping as babel and dateparser *might* need it
     ],
-    python_requires='3.12.x', # Or your minimum Python version
+    python_requires='>=3.10', # Or your minimum Python version
     entry_points={
         'console_scripts': [
             'greek_scraper=greek_scraper.cli:main', # Command to run after install: greek_scraper - more generic command name
