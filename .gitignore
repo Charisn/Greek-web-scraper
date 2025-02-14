@@ -1,0 +1,4 @@
+__pycache__/ 
+*.pyc 
+scrapy_job/ 
+venv/ 
