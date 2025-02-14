@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="web-scraper-ultra",  # More unique name, "Web-scraper" is too generic
+    name="Greek_website_scraper",
     version="0.1.0",  # Start with a version number
     author="Charis Nikolaidis", # Replace with your name - IMPORTANT
     author_email="ncharis97@gmail.com", # Replace with your email - IMPORTANT
@@ -54,10 +54,10 @@ setup(
         "pytz",  # Keeping as babel and dateparser might need it
         "python-dateutil", # Keeping as babel and dateparser *might* need it
     ],
-    python_requires='>=3.6', # Or your minimum Python version
+    python_requires='3.12.x', # Or your minimum Python version
     entry_points={
         'console_scripts': [
-            'web-scrape=greek_scraper.cli:main', # Command to run after install: web-scrape - more generic command name
+            'greek_scraper=greek_scraper.cli:main', # Command to run after install: greek_scraper - more generic command name
         ],
     },
     classifiers=[ # Optional classifiers to categorize your package
