@@ -10,7 +10,6 @@ class RobustEncodingMiddleware:
         is_text = any(x in content_type for x in ['text/html', 'text/plain', 'application/xml', 'application/xhtml+xml'])
         if is_text:
             if not response.encoding or response.encoding.lower() not in ['utf-8', 'utf8']:
-                print(f"[RobustEncodingMiddleware] Non-UTF8 encoding on {response.url}. Attempting UTF-8 decode...")
                 try:
                     decoded = response.body.decode('utf-8')
                 except UnicodeDecodeError:

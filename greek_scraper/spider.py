@@ -70,14 +70,8 @@ class ScraperSpider(scrapy.Spider): # Renamed class to ScraperSpider
 
         if self.target_language == 'gr' or self.target_language == 'greek':
             self.target_tlds = ['.gr'] # Set Greek TLDs if language is greek
-            print(f"[ScraperSpider] Targetting Greek language and .gr domains.")
         else:
             self.target_tlds = [] # Scrape all TLDs if no language specified (generic)
-            print(f"[ScraperSpider] Generic web scraping - no language or TLD restrictions.")
-
-
-        print(f"[ScraperSpider] Initialized with autodiscover={self.autodiscover}, max_domains={self.max_domains}, use_cpu={self.use_cpu}, output_file={self.output_file}, target_language={self.target_language}")
-        print(f"[ScraperSpider] Seed domains loaded: {len(self.pending_domains)}")
 
     def start_requests(self):
         # Schedule up to concurrent_domain_limit seed domains.
@@ -88,7 +82,6 @@ class ScraperSpider(scrapy.Spider): # Renamed class to ScraperSpider
                 url = self._normalize_url(domain)
                 self.discovered_domains.add(urlparse(url).netloc)
                 self.active_domains.add(urlparse(url).netloc)
-                print(f"[ScraperSpider] Scheduling initial request for: {url}")
                 yield scrapy.Request(url, callback=self.parse, errback=self.handle_error, dont_filter=True)
                 count += 1
 
@@ -105,7 +98,6 @@ class ScraperSpider(scrapy.Spider): # Renamed class to ScraperSpider
             content_type = response.headers.get('Content-Type', b'').decode('utf-8', errors='ignore').lower()
             is_text = any(x in content_type for x in ['text/html', 'text/plain', 'application/xml', 'application/xhtml+xml'])
             if not is_text:
-                print(f"[ScraperSpider] Skipping non-text content: {response.url}")
                 return item
             html_content = response.text
         except Exception as e:
@@ -207,7 +199,6 @@ class ScraperSpider(scrapy.Spider): # Renamed class to ScraperSpider
                     if netloc not in self.discovered_domains and len(self.discovered_domains) < self.max_domains:
                         self.discovered_domains.add(netloc)
                         self.active_domains.add(netloc)
-                        print(f"[ScraperSpider] (Spider Idle) Scheduling new seed domain: {url}")
                         req = scrapy.Request(url, callback=self.parse, errback=self.handle_error, dont_filter=True)
                         self.crawler.engine.crawl(req, self)
                         raise DontCloseSpider("Scheduling new seed domain")

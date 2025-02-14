@@ -80,18 +80,13 @@ class TextPipeline:
 
 class StoragePipeline:
     def __init__(self, jobdir=None, output_file='scraped_data_robust.jsonl'): # Accept output_file - default is now generic filename
-        print(f"[StoragePipeline] Initializing storage pipelines (JSON & JSONL), Output File: {output_file}...")
         self.output_file_name_jsonl = output_file # Use provided output_file name
         self.jsonl_file = open(self.output_file_name_jsonl, 'a', encoding='utf-8')
         self.json_data = []
         self.json_file_name = 'scraped_data_all_in_one.json' # Generic JSON filename
-        if jobdir:
-            print(f"[StoragePipeline] Resuming job from directory: {jobdir}")
 
     def process_item(self, item, spider):
-        self.jsonl_file.write(json.dumps(item, ensure_ascii=False) + '\n')
         self.json_data.append(item)
-        print(f"[StoragePipeline] Stored item from {item['url']}")
         return item
 
     def close_spider(self, spider):
@@ -100,4 +95,3 @@ class StoragePipeline:
         if self.json_data:
             with open(self.json_file_name, 'w', encoding='utf-8') as f:
                 json.dump(self.json_data, f, ensure_ascii=False, indent=4)
-            print(f"[StoragePipeline] JSON file saved: {self.json_file_name}")

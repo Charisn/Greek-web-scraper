@@ -20,7 +20,6 @@ class GPUTextProcessor:
         self.stream = cp.cuda.Stream()
 
     def process_batch(self, texts):
-        print("[GPUTextProcessor] Processing BATCH of texts on GPU...")
         try:
             with self.stream:
                 code_points = [np.array([ord(c) for c in t], dtype=np.uint32) for t in texts]
@@ -35,7 +34,6 @@ class GPUTextProcessor:
                     filtered = gpu_buffer[i][mask[i, :len(code_points[i])]].get()
                     cleaned = ''.join([chr(c) for c in filtered if c != 0])
                     cleaned_texts.append(cleaned)
-            print("[GPUTextProcessor] Finished GPU batch processing.")
             return cleaned_texts # Explicit return
         except Exception as e:
             print(f"[GPUTextProcessor] ERROR during batch processing: {e}")
